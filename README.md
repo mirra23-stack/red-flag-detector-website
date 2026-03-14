@@ -10,15 +10,16 @@
             --dark-pink: #f6416c;
             --bg: #fff0f3;
             --black: #2d3436;
-            --glass: rgba(255, 255, 255, 0.9);
+            --green: #2ecc71;
+            --yellow: #f1c40f;
+            --red: #e74c3c;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg);
             background-image: radial-gradient(#ff85a2 0.5px, transparent 0.5px);
             background-size: 20px 20px;
-            color: var(--black);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,24 +29,22 @@
 
         .container {
             width: 90%;
-            max-width: 400px;
+            max-width: 450px;
             background: white;
             padding: 30px;
             border-radius: 30px;
             box-shadow: 0 15px 35px rgba(246, 65, 108, 0.15);
             text-align: center;
-            transition: all 0.5s ease;
         }
 
-        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .screen { display: none; animation: fadeIn 0.4s ease; }
         .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        h1 { color: var(--dark-pink); font-size: 1.8rem; margin-bottom: 5px; }
+        .subtitle { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
 
-        h1 { color: var(--dark-pink); margin-bottom: 5px; font-size: 1.8rem; }
-        .subtitle { font-size: 0.9rem; color: #666; margin-bottom: 25px; }
-
-        input[type="text"], input[type="password"], input[type="email"], input[type="number"], input[type="date"], select {
+        textarea, input[type="text"], select {
             width: 100%;
             padding: 12px;
             margin: 8px 0;
@@ -53,10 +52,8 @@
             border-radius: 12px;
             box-sizing: border-box;
             outline: none;
-            transition: 0.3s;
+            font-family: inherit;
         }
-
-        input:focus { border-color: var(--pink); }
 
         .btn-primary {
             width: 100%;
@@ -65,38 +62,26 @@
             border: none;
             padding: 15px;
             border-radius: 15px;
-            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 15px;
+            margin-top: 10px;
             transition: 0.3s;
         }
 
-        .btn-primary:hover { transform: scale(1.02); filter: brightness(1.1); }
-
-        .link-text {
-            display: block;
-            margin-top: 15px;
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--dark-pink);
             color: var(--dark-pink);
-            text-decoration: none;
-            font-size: 0.85rem;
-            cursor: pointer;
         }
 
-        /* Questionnaire Styles */
-        .flag-list { text-align: left; max-height: 300px; overflow-y: auto; padding-right: 5px; margin: 20px 0; }
-        .flag-item {
-            display: flex; align-items: center;
-            background: #fdf2f4; margin-bottom: 10px;
-            padding: 12px; border-radius: 12px; cursor: pointer;
-        }
-        .flag-item input { margin-right: 12px; accent-color: var(--dark-pink); }
+        .flag-list { text-align: left; max-height: 250px; overflow-y: auto; margin: 20px 0; }
+        .flag-item { display: flex; align-items: center; background: #fdf2f4; margin-bottom: 8px; padding: 10px; border-radius: 10px; }
 
-        #verdict-box {
-            margin-top: 25px; padding: 20px; border-radius: 15px;
-            display: none; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes pop { 0% { transform: scale(0.5); } 100% { transform: scale(1); } }
+        /* Scanning Animation */
+        #loading-bar { width: 0%; height: 5px; background: var(--dark-pink); border-radius: 5px; transition: width 2s; }
+        .scanning-container { display: none; margin: 20px 0; }
+
+        #verdict-box { margin-top: 20px; padding: 20px; border-radius: 15px; display: none; }
     </style>
 </head>
 <body>
@@ -105,71 +90,58 @@
     
     <div id="screen-signin" class="screen active">
         <h1>Welcome Back 💖</h1>
-        <p class="subtitle">Log in to check your man.</p>
-        <input type="text" placeholder="Username" id="user">
-        <input type="password" placeholder="Password" id="pass">
-        <button class="btn-primary" onclick="showScreen('screen-info')">Login</button>
-        <span class="link-text" onclick="showScreen('screen-forgot')">Forgot Password?</span>
-        <span class="link-text" style="color:#666">Don't have an account? <b>Sign Up</b></span>
+        <p class="subtitle">Log in to check the vibes.</p>
+        <input type="text" placeholder="Username">
+        <input type="password" style="width:100%; padding:12px; border:2px solid #ffeef2; border-radius:12px;" placeholder="Password">
+        <button class="btn-primary" onclick="showScreen('screen-dashboard')">Login</button>
     </div>
 
-    <div id="screen-forgot" class="screen">
-        <h1>Recover Access</h1>
-        <p class="subtitle">Enter your Gmail to receive a 6-digit code.</p>
-        <input type="email" placeholder="Enter your Gmail" id="reset-email">
-        <button class="btn-primary" onclick="handleForgot()">Send Code</button>
-        
-        <div id="otp-section" style="display:none; margin-top:20px;">
-            <p style="font-size: 0.8rem;">Enter the 6-digit code sent to your mail:</p>
-            <input type="number" placeholder="X X X X X X" style="letter-spacing: 5px; text-align: center;">
-            <button class="btn-primary" onclick="showScreen('screen-signin')">Verify & Reset</button>
-        </div>
-        <span class="link-text" onclick="showScreen('screen-signin')">Back to Login</span>
+    <div id="screen-dashboard" class="screen">
+        <h1>Choose Your Tool 🛠️</h1>
+        <p class="subtitle">What are we investigating today?</p>
+        <button class="btn-primary" onclick="showScreen('screen-test')">🚩 The Flag Quiz</button>
+        <button class="btn-primary" onclick="showScreen('screen-upload')">📸 Screenshot Scanner</button>
+        <button class="btn-primary" onclick="showScreen('screen-behavior')">✍️ Behavior Analysis</button>
     </div>
 
-    <div id="screen-info" class="screen">
-        <h1>The Basics 📝</h1>
-        <p class="subtitle">Tell us about you two.</p> 
-        <input type="text" placeholder="Your Name">
-        <div style="display: flex; gap: 10px;">
-            <input type="number" placeholder="Your Age">
-            <select><option>Your Zodiac</option><option>Aries</option><option>Leo</option><option>Scorpio</option><option>Other</option></select>
-        </div>
-        <hr style="border: 1px solid #eee; margin: 15px 0;">
-        <input type="text" placeholder="Boyfriend's Name">
-        <div style="display: flex; gap: 10px;">
-            <input type="number" placeholder="His Age">
-            <select><option>His Zodiac</option><option>Aries</option><option>Leo</option><option>Scorpio</option><option>Other</option></select>
-        </div>
-        <p style="text-align:left; font-size: 0.8rem; margin-bottom:0;">His Date of Birth:</p>
-        <input type="date">
-        <button class="btn-primary" onclick="showScreen('screen-test')">Next: The Red Flag Test</button>
+    <div id="screen-upload" class="screen">
+        <h1>Screenshot Scan 📸</h1>
+        <p class="subtitle">Upload a chat to detect manipulation.</p>
+        <input type="file" id="fileInput" accept="image/*" style="margin: 20px 0;">
+        <button class="btn-primary" onclick="simulateScan('screen-upload')">Analyze Chat</button>
+        <button class="btn-primary btn-outline" onclick="showScreen('screen-dashboard')">Back</button>
+    </div>
+
+    <div id="screen-behavior" class="screen">
+        <h1>Behavior Input ✍️</h1>
+        <p class="subtitle">Describe a situation or something they said.</p>
+        <textarea id="behaviorText" rows="4" placeholder="Example: He got mad because I didn't answer within 5 minutes..."></textarea>
+        <button class="btn-primary" onclick="simulateScan('screen-behavior')">Check Behavior</button>
+        <button class="btn-primary btn-outline" onclick="showScreen('screen-dashboard')">Back</button>
     </div>
 
     <div id="screen-test" class="screen">
-        <h1>The Verdict 🚩</h1>
-        <p class="subtitle">Be honest, girl. Check all that apply:</p>
-        
+        <h1>The Flag Test 🚩</h1>
         <div class="flag-list">
-            <label class="flag-item"><input type="checkbox" value="10"> He "forgets" to text back for 8 hours</label>
-            <label class="flag-item"><input type="checkbox" value="20"> He follows his "crazy" ex on IG</label>
-            <label class="flag-item"><input type="checkbox" value="30"> He hides his phone when you walk by</label>
-            <label class="flag-item"><input type="checkbox" value="15"> He’s "besties" with a girl he used to like</label>
-            <label class="flag-item"><input type="checkbox" value="25"> He gets mad when you go out with friends</label>
-            <label class="flag-item"><input type="checkbox" value="20"> He says "You're overreacting" during fights</label>
-            <label class="flag-item"><input type="checkbox" value="40"> He still has Tinder "for the memes"</label>
-            <label class="flag-item"><input type="checkbox" value="10"> He’s 25+ and still has a "gaming chair" but no job</label>
-            <label class="flag-item"><input type="checkbox" value="50"> He tells you what you can and can't wear</label>
-            <label class="flag-item"><input type="checkbox" value="20"> He likes every photo of his "cousin" (who isn't his cousin)</label>
+            <label class="flag-item"><input type="checkbox" value="30"> Hides his phone when you walk by</label>
+            <label class="flag-item"><input type="checkbox" value="25"> Gets mad when you go out with friends</label>
+            <label class="flag-item"><input type="checkbox" value="20"> Says "You're overreacting"</label>
+            <label class="flag-item"><input type="checkbox" value="40"> Still has dating apps</label>
+            <label class="flag-item"><input type="checkbox" value="50"> Controls what you wear</label>
         </div>
+        <button class="btn-primary" onclick="calculateRisk()">GET VERDICT</button>
+        <button class="btn-primary btn-outline" onclick="showScreen('screen-dashboard')">Back</button>
+    </div>
 
-        <button class="btn-primary" onclick="calculateRisk()">GET THE VERDICT</button>
+    <div class="scanning-container" id="scanner">
+        <p>🔍 Scanning for toxic patterns...</p>
+        <div style="background: #eee; border-radius: 5px;"><div id="loading-bar"></div></div>
+    </div>
 
-        <div id="verdict-box">
-            <h2 id="verdict-title"></h2>
-            <p id="verdict-desc"></p>
-            <button class="btn-primary" style="background:#2d3436" onclick="location.reload()">Start Over</button>
-        </div>
+    <div id="verdict-box">
+        <h2 id="verdict-title"></h2>
+        <p id="verdict-desc" style="font-size: 0.9rem;"></p>
+        <button class="btn-primary" style="background:#2d3436" onclick="resetApp()">Try Another Tool</button>
     </div>
 
 </div>
@@ -177,53 +149,73 @@
 <script>
     function showScreen(screenId) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('verdict-box').style.display = 'none';
         document.getElementById(screenId).classList.add('active');
     }
 
-    function handleForgot() {
-        const email = document.getElementById('reset-email').value;
-        if(email.includes('@')) {
-            document.getElementById('otp-section').style.display = 'block';
-            alert("Verification code sent to " + email);
-        } else {
-            alert("Please enter a valid Gmail!");
-        }
+    function simulateScan(currentScreen) {
+        // Hide the current inputs
+        document.getElementById(currentScreen).classList.remove('active');
+        const scanner = document.getElementById('scanner');
+        const bar = document.getElementById('loading-bar');
+        
+        scanner.style.display = 'block';
+        setTimeout(() => bar.style.width = '100%', 100);
+
+        // After 2.5 seconds, show result
+        setTimeout(() => {
+            scanner.style.display = 'none';
+            bar.style.width = '0%';
+            displayRandomResult();
+        }, 2500);
+    }
+
+    function displayRandomResult() {
+        const box = document.getElementById('verdict-box');
+        const title = document.getElementById('verdict-title');
+        const desc = document.getElementById('verdict-desc');
+        
+        box.style.display = "block";
+        // Logic: For a real app, this is where you'd call an AI API. 
+        // For the prototype, we show a "Red Flag" result.
+        box.style.background = "#fff5f5";
+        title.innerText = "🚨 RED FLAG DETECTED";
+        title.style.color = "#c53030";
+        desc.innerText = "Pattern Analysis: We detected signs of Controlling Behavior and Gaslighting. Recommendation: Set firm boundaries.";
     }
 
     function calculateRisk() {
         const checks = document.querySelectorAll('#screen-test input[type="checkbox"]');
         let score = 0;
         checks.forEach(c => { if(c.checked) score += parseInt(c.value); });
+        
+        document.getElementById('screen-test').classList.remove('active');
+        displayResultByScore(score);
+    }
 
+    function displayResultByScore(score) {
         const box = document.getElementById('verdict-box');
         const title = document.getElementById('verdict-title');
         const desc = document.getElementById('verdict-desc');
-        
         box.style.display = "block";
-        window.scrollTo(0, document.body.scrollHeight);
 
         if (score === 0) {
             box.style.background = "#e6fffa";
-            title.innerText = "🏆 PURE GREEN FLAG";
-            title.style.color = "#2c7a7b";
-            desc.innerText = "He is literally a fictional character. Marry him.";
-        } else if (score < 40) {
+            title.innerText = "💚 GREEN FLAG";
+            desc.innerText = "Everything looks healthy! Stay happy.";
+        } else if (score < 50) {
             box.style.background = "#fffaf0";
-            title.innerText = "⚠️ YELLOW ZONE";
-            title.style.color = "#975a16";
-            desc.innerText = "He's okay, but keep your eyes open. Communication is key!";
-        } else if (score < 80) {
-            box.style.background = "#fff5f5";
-            title.innerText = "🚨 RED FLAG DETECTED";
-            title.style.color = "#c53030";
-            desc.innerText = "Girl, he’s toxic. You deserve better than this stress!";
+            title.innerText = "⚠️ YELLOW FLAG";
+            desc.innerText = "Some warning signs detected. Keep an eye out.";
         } else {
-            box.style.background = "#742a2a";
-            title.innerText = "☢️ NUCLEAR BIOHAZARD";
-            title.style.color = "#fff";
-            desc.style.color = "#fff";
-            desc.innerText = "BLOCK HIM. DELETE HIS NUMBER. CHANGE YOUR IDENTITY. RUN!";
+            box.style.background = "#fff5f5";
+            title.innerText = "🚩 RED FLAG";
+            desc.innerText = "High toxicity detected. Protect your peace!";
         }
+    }
+
+    function resetApp() {
+        location.reload();
     }
 </script>
 

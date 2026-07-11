@@ -12,7 +12,7 @@
             --black: #2d3436;
             --green: #2ecc71;
             --yellow: #f1c40f;
-            --red: #e74c3c;
+            --red: #e74c3c; 
         }
 
         body {
